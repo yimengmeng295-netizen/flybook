@@ -1,0 +1,12 @@
+build/
+config.json
+.token_cache
+*.exe
+*.dll
+*.tar.gz
+*.zip
+*.mp4
+test_*
+*.out
+.vscode/
+.claude/

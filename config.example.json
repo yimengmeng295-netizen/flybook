@@ -1,0 +1,8 @@
+{
+    "app_id": "cli_xxxxxxxx",
+    "app_secret": "your_app_secret_here",
+    "receive_id_type": "user_id",
+    "contacts": {
+        "联系人名": "用户ID或open_id"
+    }
+}
