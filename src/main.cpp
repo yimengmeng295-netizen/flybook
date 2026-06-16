@@ -24,6 +24,20 @@ static void printUsage() {
         "  --help            Show this help\n";
 }
 
+static std::string toUtf8(const std::string& input) {
+    if (input.empty()) return input;
+    int wlen = MultiByteToWideChar(CP_ACP, 0, input.c_str(), -1, nullptr, 0);
+    if (wlen == 0) return input;
+    std::wstring wide(wlen, L'\0');
+    MultiByteToWideChar(CP_ACP, 0, input.c_str(), -1, wide.data(), wlen);
+    int ulen = WideCharToMultiByte(CP_UTF8, 0, wide.c_str(), -1, nullptr, 0, nullptr, nullptr);
+    if (ulen == 0) return input;
+    std::string utf8(ulen, '\0');
+    WideCharToMultiByte(CP_UTF8, 0, wide.c_str(), -1, utf8.data(), ulen, nullptr, nullptr);
+    if (!utf8.empty() && utf8.back() == '\0') utf8.pop_back();
+    return utf8;
+}
+
 static std::string exeDir() {
     char buf[MAX_PATH];
     DWORD len = GetModuleFileNameA(nullptr, buf, MAX_PATH);
@@ -112,6 +126,11 @@ int main(int argc, char* argv[]) {
             return 1;
         }
     }
+
+    // Convert args from system code page to UTF-8
+    to = toUtf8(to);
+    text = toUtf8(text);
+    file = toUtf8(file);
 
     // Validate required args
     if (to.empty()) {

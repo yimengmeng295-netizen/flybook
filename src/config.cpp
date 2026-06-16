@@ -5,7 +5,7 @@
 using json = nlohmann::json;
 
 Config::Config(const std::string& path) {
-    std::ifstream f(path);
+    std::ifstream f(path, std::ios::binary);
     if (!f.is_open()) {
         throw std::runtime_error("Cannot open config file: " + path);
     }
