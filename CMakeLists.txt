@@ -4,18 +4,20 @@ project(flybook VERSION 1.0.0 LANGUAGES CXX)
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-# ---- Dependencies ----
+# ---- Dependencies (vendored, no network required) ----
 
-# libcurl (install via vcpkg: vcpkg install curl:x64-windows)
-find_package(CURL REQUIRED)
-
-# nlohmann/json (header-only, fetched automatically)
-include(FetchContent)
-FetchContent_Declare(json
-    URL https://github.com/nlohmann/json/releases/download/v3.11.3/json.tar.xz
-    URL_HASH SHA256=d6c65aca6b1ed68e7a182f4757257b107ae403032760ed6ef121c9d55e81757d
+# libcurl
+set(CURL_INCLUDE_DIR "${CMAKE_SOURCE_DIR}/vendor/curl/include")
+set(CURL_LIBRARY "${CMAKE_SOURCE_DIR}/vendor/curl/lib/libcurl.dll.a")
+add_library(curl STATIC IMPORTED)
+set_target_properties(curl PROPERTIES
+    IMPORTED_LOCATION "${CURL_LIBRARY}"
+    INTERFACE_INCLUDE_DIRECTORIES "${CURL_INCLUDE_DIR}"
 )
-FetchContent_MakeAvailable(json)
+
+# nlohmann/json (header-only)
+add_library(nlohmann_json INTERFACE)
+target_include_directories(nlohmann_json INTERFACE "${CMAKE_SOURCE_DIR}/vendor/json/include")
 
 # ---- Source files ----
 
@@ -37,7 +39,7 @@ set(HEADERS
 add_executable(flybook ${SOURCES} ${HEADERS})
 
 target_include_directories(flybook PRIVATE src)
-target_link_libraries(flybook PRIVATE CURL::libcurl nlohmann_json::nlohmann_json)
+target_link_libraries(flybook PRIVATE curl nlohmann_json)
 
 # ---- Install ----
 
